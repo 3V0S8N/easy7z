@@ -1,7 +1,7 @@
 // ZipAddCommon.h
 
-#ifndef __ZIP_ADD_COMMON_H
-#define __ZIP_ADD_COMMON_H
+#ifndef ZIP7_INC_ZIP_ADD_COMMON_H
+#define ZIP7_INC_ZIP_ADD_COMMON_H
 
 #include "../../ICoder.h"
 #include "../../IProgress.h"
@@ -28,20 +28,24 @@ struct CCompressingResult
   Byte ExtractVersion;
   bool DescriptorMode;
   bool LzmaEos;
+
+  CCompressingResult()
+  {
+    // for GCC:
+    UnpackSize = 0;
+  }
 };
 
-class CAddCommon
+class CAddCommon  MY_UNCOPYABLE
 {
   CCompressionMethodMode _options;
-  NCompress::CCopyCoder *_copyCoderSpec;
-  CMyComPtr<ICompressCoder> _copyCoder;
+  CMyComPtr2<ICompressCoder, NCompress::CCopyCoder> _copyCoder;
 
   CMyComPtr<ICompressCoder> _compressEncoder;
   Byte _compressExtractVersion;
   bool _isLzmaEos;
 
-  CFilterCoder *_cryptoStreamSpec;
-  CMyComPtr<ISequentialOutStream> _cryptoStream;
+  CMyComPtr2<ISequentialOutStream, CFilterCoder> _cryptoStream;
 
   NCrypto::NZip::CEncoder *_filterSpec;
   NCrypto::NWzAes::CEncoder *_filterAesSpec;
@@ -50,7 +54,9 @@ class CAddCommon
   
   HRESULT CalcStreamCRC(ISequentialInStream *inStream, UInt32 &resultCRC);
 public:
-  CAddCommon(const CCompressionMethodMode &options);
+  // CAddCommon(const CCompressionMethodMode &options);
+  CAddCommon();
+  void SetOptions(const CCompressionMethodMode &options);
   ~CAddCommon();
 
   HRESULT Set_Pre_CompressionResult(bool inSeqMode, bool outSeqMode, UInt64 unpackSize,
@@ -60,7 +66,8 @@ public:
       DECL_EXTERNAL_CODECS_LOC_VARS
       ISequentialInStream *inStream, IOutStream *outStream,
       bool inSeqMode, bool outSeqMode,
-      UInt32 fileTime, UInt64 expectedDataSize,
+      UInt32 fileTime,
+      UInt64 expectedDataSize, bool expectedDataSize_IsConfirmed,
       ICompressProgressInfo *progress, CCompressingResult &opRes);
 };
 

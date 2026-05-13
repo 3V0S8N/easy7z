@@ -22,6 +22,7 @@ static LPCWSTR const kLangValueName = L"Lang";
 static LPCWSTR const kViewer = L"Viewer";
 static LPCWSTR const kEditor = L"Editor";
 static LPCWSTR const kDiff = L"Diff";
+static LPCWSTR const kVerCtrlPath = L"7vc";
 
 static LPCTSTR const kShowDots = TEXT("ShowDots");
 static LPCTSTR const kShowRealFileIcons = TEXT("ShowRealFileIcons");
@@ -63,6 +64,8 @@ void ReadRegEditor(bool useEditor, UString &path) { ReadCuString(kCU_FMPath, use
 void SaveRegDiff(const UString &path) { SaveCuString(kCU_FMPath, kDiff, path); }
 void ReadRegDiff(UString &path) { ReadCuString(kCU_FMPath, kDiff, path); }
 
+void ReadReg_VerCtrlPath(UString &path) { ReadCuString(kCU_FMPath, kVerCtrlPath, path); }
+
 static void Save7ZipOption(LPCTSTR value, bool enabled)
 {
   CKey key;
@@ -83,17 +86,15 @@ static bool Read7ZipOption(LPCTSTR value, bool defaultValue)
   if (key.Open(HKEY_CURRENT_USER, kCUBasePath, KEY_READ) == ERROR_SUCCESS)
   {
     bool enabled;
-    if (key.QueryValue(value, enabled) == ERROR_SUCCESS)
+    if (key.GetValue_bool_IfOk(value, enabled) == ERROR_SUCCESS)
       return enabled;
   }
   return defaultValue;
 }
 
-static void ReadOption(CKey &key, LPCTSTR value, bool &dest)
+static void ReadOption(CKey &key, LPCTSTR name, bool &dest)
 {
-  bool enabled = false;
-  if (key.QueryValue(value, enabled) == ERROR_SUCCESS)
-    dest = enabled;
+  key.GetValue_bool_IfOk(name, dest);
 }
 
 /*
@@ -134,6 +135,11 @@ void CFmSettings::Load()
 {
   ShowDots = false;
   ShowRealFileIcons = false;
+  /* if (FullRow == false), we can use mouse click on another columns
+     to select group of files. We need to implement additional
+     way to select files in any column as in Explorer.
+     Then we can enable (FullRow == true) default mode. */
+  // FullRow = true;
   FullRow = false;
   ShowGrid = false;
   SingleClick = false;

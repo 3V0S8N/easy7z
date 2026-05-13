@@ -1,19 +1,19 @@
 CFLAGS = $(CFLAGS) \
-  -DLANG \
-  -DNEW_FOLDER_INTERFACE \
+  -DZ7_LANG \
 
 !IFDEF UNDER_CE
 LIBS = $(LIBS) ceshell.lib Commctrl.lib
 !ELSE
 LIBS = $(LIBS) comctl32.lib htmlhelp.lib comdlg32.lib Mpr.lib Gdi32.lib
-CFLAGS = $(CFLAGS) -DWIN_LONG_PATH -DSUPPORT_DEVICE_FILE
-LFLAGS = $(LFLAGS) /DELAYLOAD:mpr.dll 
-LIBS = $(LIBS) delayimp.lib 
+CFLAGS = $(CFLAGS) -DZ7_DEVICE_FILE
+LFLAGS = $(LFLAGS) /DELAYLOAD:mpr.dll
+LIBS = $(LIBS) delayimp.lib
 !ENDIF
 
 FM_OBJS = \
   $O\App.obj \
   $O\BrowseDialog.obj \
+  $O\BrowseDialog2.obj \
   $O\ClassDefs.obj \
   $O\EnumFormatEtc.obj \
   $O\ExtractCallback.obj \
@@ -26,6 +26,7 @@ FM_OBJS = \
   $O\FSFolderCopy.obj \
   $O\HelpUtils.obj \
   $O\LangUtils.obj \
+  $O\MemDialog.obj \
   $O\MenuPage.obj \
   $O\MyLoadMenu.obj \
   $O\OpenCallback.obj \
@@ -47,7 +48,6 @@ FM_OBJS = \
   $O\ProgramLocation.obj \
   $O\PropertyName.obj \
   $O\RegistryAssociations.obj \
-  $O\RegistryPlugins.obj \
   $O\RegistryUtils.obj \
   $O\RootFolder.obj \
   $O\SplitUtils.obj \
@@ -71,6 +71,7 @@ FM_OBJS = \
   $O\SettingsPage.obj \
   $O\SplitDialog.obj \
   $O\SystemPage.obj \
+  $O\VerCtrl.obj \
 
 !IFNDEF UNDER_CE
 
@@ -98,3 +99,5 @@ AGENT_OBJS = \
   $O\ArchiveFolderOpen.obj \
   $O\ArchiveFolderOut.obj \
   $O\UpdateCallbackAgent.obj \
+
+# we need empty line after last line above

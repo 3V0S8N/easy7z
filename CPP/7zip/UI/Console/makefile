@@ -1,10 +1,11 @@
 PROG = 7z.exe
 CFLAGS = $(CFLAGS)  \
-  -DEXTERNAL_CODECS \
+  -DZ7_EXTERNAL_CODECS \
 
 COMMON_OBJS = \
   $O\CommandLineParser.obj \
   $O\CRC.obj \
+  $O\DynLimBuf.obj \
   $O\IntToString.obj \
   $O\ListFileUtils.obj \
   $O\NewHandler.obj \
@@ -31,6 +32,7 @@ WIN_OBJS = \
   $O\PropVariantConv.obj \
   $O\Registry.obj \
   $O\System.obj \
+  $O\SystemInfo.obj \
   $O\TimeUtils.obj \
 
 7ZIP_COMMON_OBJS = \
@@ -40,6 +42,7 @@ WIN_OBJS = \
   $O\FilterCoder.obj \
   $O\LimitedStreams.obj \
   $O\MethodProps.obj \
+  $O\MultiOutStream.obj \
   $O\ProgressUtils.obj \
   $O\PropId.obj \
   $O\StreamObjects.obj \
@@ -47,6 +50,7 @@ WIN_OBJS = \
   $O\UniqBlocks.obj \
 
 AR_COMMON_OBJS = \
+  $O\ItemNameUtils.obj \
   $O\OutStreamWithCRC.obj \
 
 COMPRESS_OBJS = \
@@ -55,10 +59,10 @@ COMPRESS_OBJS = \
 C_OBJS = $(C_OBJS) \
   $O\Alloc.obj \
   $O\CpuArch.obj \
-  $O\Sort.obj \
   $O\Threads.obj \
 
 !include "../../Crc.mak"
+!include "../../Sort.mak"
 !include "Console.mak"
 
 !include "../../7zip.mak"

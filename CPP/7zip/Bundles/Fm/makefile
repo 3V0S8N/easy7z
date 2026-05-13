@@ -20,9 +20,9 @@ WIN_OBJS = $(WIN_OBJS) \
   $O\MemoryLock.obj \
   $O\Menu.obj \
   $O\ProcessUtils.obj \
-  $O\PropVariantConv.obj \
   $O\Registry.obj \
   $O\ResourceString.obj \
+  $O\SystemInfo.obj \
   $O\Shell.obj \
   $O\Window.obj \
 
@@ -36,6 +36,7 @@ WIN_CTRL_OBJS = \
 7ZIP_COMMON_OBJS = $(7ZIP_COMMON_OBJS) \
   $O\FilePathAutoRename.obj \
   $O\FileStreams.obj \
+  $O\MultiOutStream.obj \
 
 UI_COMMON_OBJS = \
   $O\ArchiveExtractCallback.obj \

@@ -52,8 +52,8 @@ int CompareFileNames_ForFolderList(const wchar_t *s1, const wchar_t *s2)
 
 static int CompareFileNames_Le16(const Byte *s1, unsigned size1, const Byte *s2, unsigned size2)
 {
-  size1 &= ~1;
-  size2 &= ~1;
+  size1 &= ~1u;
+  size2 &= ~1u;
   for (unsigned i = 0;; i += 2)
   {
     if (i >= size1)
@@ -76,13 +76,13 @@ static int CompareFileNames_Le16(const Byte *s1, unsigned size1, const Byte *s2,
 
 static inline const wchar_t *GetExtensionPtr(const UString &name)
 {
-  int dotPos = name.ReverseFind_Dot();
-  return name.Ptr((dotPos < 0) ? name.Len() : dotPos);
+  const int dotPos = name.ReverseFind_Dot();
+  return name.Ptr(dotPos < 0 ? name.Len() : (unsigned)dotPos);
 }
 
 void CPanel::SetSortRawStatus()
 {
-  _isRawSortProp = false;
+  _isRawSortProp = 0; // false;
   FOR_VECTOR (i, _columns)
   {
     const CPropColumn &prop = _columns[i];
@@ -95,21 +95,15 @@ void CPanel::SetSortRawStatus()
 }
 
 
-int CALLBACK CompareItems2(LPARAM lParam1, LPARAM lParam2, LPARAM lpData)
+static int CALLBACK CompareItems2(const LPARAM lParam1, const LPARAM lParam2,
+    const CPanel * const panel, const PROPID propID, const Int32 isRawProp)
 {
-  if (lpData == 0)
-    return 0;
-  CPanel *panel = (CPanel*)lpData;
-  
-
-  PROPID propID = panel->_sortID;
-
   if (propID == kpidNoProperty)
     return MyCompare(lParam1, lParam2);
 
-  if (panel->_isRawSortProp)
+  if (isRawProp)
   {
-    // Sha1, NtSecurity, NtReparse
+    // Sha1, Checksum, NtSecurity, NtReparse
     const void *data1;
     const void *data2;
     UInt32 dataSize1;
@@ -135,16 +129,16 @@ int CALLBACK CompareItems2(LPARAM lParam1, LPARAM lParam2, LPARAM lpData)
   }
 
   if (panel->_folderCompare)
-    return panel->_folderCompare->CompareItems((UInt32)lParam1, (UInt32)lParam2, propID, panel->_isRawSortProp);
+    return panel->_folderCompare->CompareItems((UInt32)lParam1, (UInt32)lParam2, propID, isRawProp);
   
   switch (propID)
   {
     // if (panel->_sortIndex == 0)
     case kpidName:
     {
-      const UString name1 = panel->GetItemName((int)lParam1);
-      const UString name2 = panel->GetItemName((int)lParam2);
-      int res = CompareFileNames_ForFolderList(name1, name2);
+      const UString name1 = panel->GetItemName((unsigned)lParam1);
+      const UString name2 = panel->GetItemName((unsigned)lParam2);
+      const int res = CompareFileNames_ForFolderList(name1, name2);
       /*
       if (res != 0 || !panel->_flatMode)
         return res;
@@ -156,8 +150,8 @@ int CALLBACK CompareItems2(LPARAM lParam1, LPARAM lParam2, LPARAM lpData)
     }
     case kpidExtension:
     {
-      const UString name1 = panel->GetItemName((int)lParam1);
-      const UString name2 = panel->GetItemName((int)lParam2);
+      const UString name1 = panel->GetItemName((unsigned)lParam1);
+      const UString name2 = panel->GetItemName((unsigned)lParam2);
       return CompareFileNames_ForFolderList(
           GetExtensionPtr(name1),
           GetExtensionPtr(name2));
@@ -182,23 +176,48 @@ int CALLBACK CompareItems2(LPARAM lParam1, LPARAM lParam2, LPARAM lpData)
   return prop1.Compare(prop2);
 }
 
-
+int CALLBACK CompareItems(LPARAM lParam1, LPARAM lParam2, LPARAM lpData);
 int CALLBACK CompareItems(LPARAM lParam1, LPARAM lParam2, LPARAM lpData)
 {
   if (lpData == 0) return 0;
-  if (lParam1 == kParentIndex) return -1;
-  if (lParam2 == kParentIndex) return 1;
+  if (lParam1 == (int)kParentIndex) return -1;
+  if (lParam2 == (int)kParentIndex) return 1;
 
-  CPanel *panel = (CPanel*)lpData;
+  const CPanel *panel = (CPanel*)lpData;
 
-  bool isDir1 = panel->IsItem_Folder((int)lParam1);
-  bool isDir2 = panel->IsItem_Folder((int)lParam2);
-  
-  if (isDir1 && !isDir2) return -1;
-  if (isDir2 && !isDir1) return 1;
+  const bool isDir1 = panel->IsItem_Folder((unsigned)lParam1);
+  const bool isDir2 = panel->IsItem_Folder((unsigned)lParam2);
+  if (isDir1 != isDir2)
+    return isDir1 ? -1 : 1;
 
-  int result = CompareItems2(lParam1, lParam2, lpData);
-  return panel->_ascending ? result: (-result);
+  /*
+  we have up to 3 iterations:
+    1: prop,
+    2:             kpidName, kpidPrefix
+    3: prop,       kpidName, kpidPrefix
+    3: kpidPrefix, kpidName, kpidPrefix : is some rare case
+  */
+  PROPID propID = panel->_sortID;
+  int res = 0;
+  for (unsigned iter = 0; iter < 3; iter++)
+  {
+    res = CompareItems2(lParam1, lParam2, panel, propID,
+        iter ? 0 : panel->_isRawSortProp);
+    if (res)
+      break;
+    if (propID == kpidName)
+    {
+      // if (!_flatMode.IsEmpty()) break; // !_flatMode ;
+      propID = kpidPrefix;
+      continue;
+    }
+    if (iter)
+      break;
+    propID = kpidName;
+  }
+  if (res == 0)
+    res = MyCompare(lParam1, lParam2); // order of LoadSubItems()
+  return panel->_ascending ? res: -res;
 }
 
 

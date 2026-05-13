@@ -12,31 +12,27 @@
 #include "Panel.h"
 #include "ViewSettings.h"
 
-#ifdef LANG
 #include "LangUtils.h"
-#endif
 
 using namespace NWindows;
 
 static bool IsFileExistentAndNotDir(const wchar_t * lpszFile)
 {
-	DWORD	dwAttr;
-	dwAttr = GetFileAttributesW(lpszFile);
-	return (dwAttr != INVALID_FILE_ATTRIBUTES) 
-		&& ((dwAttr & FILE_ATTRIBUTE_ARCHIVE) != 0)
-		&& ((dwAttr & FILE_ATTRIBUTE_DIRECTORY) == 0);
+  DWORD dwAttr = GetFileAttributesW(lpszFile);
+  return (dwAttr != INVALID_FILE_ATTRIBUTES)
+      && ((dwAttr & FILE_ATTRIBUTE_ARCHIVE) != 0)
+      && ((dwAttr & FILE_ATTRIBUTE_DIRECTORY) == 0);
 }
 
 static bool IsDirectory(LPCWSTR lpszPathFile)
 {
-	DWORD	dwAttr;
-	dwAttr = GetFileAttributesW(lpszPathFile);
-	return (dwAttr != (DWORD)-1) && ((dwAttr & FILE_ATTRIBUTE_DIRECTORY) != 0);
+  DWORD dwAttr = GetFileAttributesW(lpszPathFile);
+  return (dwAttr != (DWORD)-1) && ((dwAttr & FILE_ATTRIBUTE_DIRECTORY) != 0);
 }
 
 bool CCopyDialog::OnInit()
 {
-  #ifdef LANG
+  #ifdef Z7_LANG
   LangSetDlgItems(*this, NULL, 0);
   #endif
   _path.Attach(GetItem(IDC_COPY));
@@ -129,10 +125,8 @@ bool CCopyDialog::OnSize(WPARAM /* wParam */, int xSize, int ySize)
   int bx1, bx2, by;
   GetItemSizes(IDCANCEL, bx1, by);
   GetItemSizes(IDOK, bx2, by);
-  int y = ySize - my - by;
-  int x = xSize - mx - bx1;
-
-//  InvalidateRect(NULL);
+  const int y = ySize - my - by;
+  const int x = xSize - mx - bx1;
 
   {
     RECT r;
@@ -147,12 +141,9 @@ bool CCopyDialog::OnSize(WPARAM /* wParam */, int xSize, int ySize)
     int byOpen = r.bottom - r.top;
     MoveItem(IDC_COPY_OPEN_PATH, xSize - mx - bxOpen - mx/2 - bxAddFileName, r.top, bxOpen, byOpen, false);
 
-	GetClientRectOfItem(IDB_COPY_SET_PATH, r);
-//    int bx = RECT_SIZE_X(r);
+    GetClientRectOfItem(IDB_COPY_SET_PATH, r);
     int bxSet = RECT_SIZE_X(r);
     int bySet = RECT_SIZE_Y(r);
-//    MoveItem(IDB_COPY_SET_PATH, xSize - mx - bx, r.top, bx, RECT_SIZE_Y(r));
-//    ChangeSubWindowSizeX(_path, xSize - mx - mx - bx - mx);
     MoveItem(IDB_COPY_SET_PATH, xSize - mx - bxSet - bxOpen - mx - bxAddFileName, r.top, bxSet, bySet, false);
     ChangeSubWindowSizeX(_path, xSize - mx - mx - bxSet - bxOpen - mx - mx/2 - bxAddFileName, false);
   }
@@ -160,15 +151,12 @@ bool CCopyDialog::OnSize(WPARAM /* wParam */, int xSize, int ySize)
   {
     RECT r;
     GetClientRectOfItem(IDT_COPY_INFO, r);
-//    NControl::CStatic staticContol;
-//    staticContol.Attach(GetItem(IDT_COPY_INFO));
-    int yPos = r.top;
-	int xc = xSize - mx * 2;
-//    staticContol.Move(mx, yPos, xSize - mx * 2, y - 2 - yPos);
-	MoveItem(IDT_COPY_INFO, mx, yPos, xc, y - 2 - yPos, false);
+    const int yPos = r.top;
+    const int xc = xSize - mx * 2;
+    MoveItem(IDT_COPY_INFO, mx, yPos, xc, y - 2 - yPos, false);
 
     GetClientRectOfItem(IDC_AFTER_EXTRACT, r);
-	MoveItem(IDC_AFTER_EXTRACT, mx, r.top, xc, r.bottom-r.top, false);
+    MoveItem(IDC_AFTER_EXTRACT, mx, r.top, xc, r.bottom - r.top, false);
   }
 
   MoveItem(IDCANCEL, x, y, bx1, by, false);
@@ -178,7 +166,7 @@ bool CCopyDialog::OnSize(WPARAM /* wParam */, int xSize, int ySize)
   return false;
 }
 
-bool CCopyDialog::OnButtonClicked(int buttonID, HWND buttonHWND)
+bool CCopyDialog::OnButtonClicked(unsigned buttonID, HWND buttonHWND)
 {
   switch (buttonID)
   {
@@ -383,7 +371,7 @@ void CCopyDialog::ShowPathFreeSpace(UString & strPath)
 	_freeSpace.SetText(strText);
 }
 
-bool CCopyDialog::OnCommand(int code, int itemID, LPARAM lParam)
+bool CCopyDialog::OnCommand(unsigned code, unsigned itemID, LPARAM lParam)
 {
 	if (itemID == IDC_COPY)
 	{

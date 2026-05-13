@@ -1,10 +1,11 @@
 // CopyDialog.h
 
-#ifndef __COPY_DIALOG_H
-#define __COPY_DIALOG_H
+#ifndef ZIP7_INC_COPY_DIALOG_H
+#define ZIP7_INC_COPY_DIALOG_H
 
 #include "../../../Windows/Control/ComboBox.h"
 #include "../../../Windows/Control/Dialog.h"
+#include "../../../Windows/Control/Static.h"
 
 #include "CopyDialogRes.h"
 
@@ -14,23 +15,24 @@ class CCopyDialog: public NWindows::NControl::CModalDialog
 {
   NWindows::NControl::CComboBox _path;
   NWindows::NControl::CStatic _freeSpace;
-  virtual void OnOK();
-  virtual bool OnInit();
-  virtual bool OnSize(WPARAM wParam, int xSize, int ySize);
+  virtual void OnOK() Z7_override;
+  virtual bool OnInit() Z7_override;
+  virtual bool OnSize(WPARAM wParam, int xSize, int ySize) Z7_override;
+  virtual bool OnButtonClicked(unsigned buttonID, HWND buttonHWND) Z7_override;
   void OnButtonSetPath();
   void OnButtonOpenPath();
   void OnButtonAddFileName();
-  bool OnButtonClicked(int buttonID, HWND buttonHWND);
-  bool OnCommand(int code, int itemID, LPARAM lParam);
+  bool OnCommand(unsigned code, unsigned itemID, LPARAM lParam) Z7_override;
   bool OnGetMinMaxInfo(PMINMAXINFO pMMI);
 
   void ShowPathFreeSpace(UString & strPath);
 
 protected:
-	SIZE m_sizeMinWindow;
+  SIZE m_sizeMinWindow;
 
 public:
-  CCopyDialog(): m_bOpenOutputFolder(false), m_bDeleteSourceFile(false), m_bClose7Zip (false) { m_sizeMinWindow.cx = 0; m_sizeMinWindow.cy = 0; }
+  CCopyDialog(): m_bOpenOutputFolder(false), m_bDeleteSourceFile(false), m_bClose7Zip(false)
+  { m_sizeMinWindow.cx = 0; m_sizeMinWindow.cy = 0; }
 
   UString Title;
   UString Static;
@@ -45,9 +47,9 @@ public:
   UString m_currentFolderPrefix;
   UString m_strRealFileName;
 
-  INT_PTR Create(HWND parentWindow = 0) { return CModalDialog::Create(IDD_COPY, parentWindow); }
+  INT_PTR Create(HWND parentWindow = NULL) { return CModalDialog::Create(IDD_COPY, parentWindow); }
 
-  bool OnMessage(UINT message, WPARAM wParam, LPARAM lParam);
+  bool OnMessage(UINT message, WPARAM wParam, LPARAM lParam) Z7_override;
 };
 
 #endif

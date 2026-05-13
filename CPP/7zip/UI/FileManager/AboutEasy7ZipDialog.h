@@ -9,10 +9,10 @@
 class CAboutEasy7ZipDialog: public NWindows::NControl::CModalDialog
 {
 public:
-  virtual bool OnInit();
-  virtual void OnHelp();
-  virtual bool OnButtonClicked(int buttonID, HWND buttonHWND);
-  INT_PTR Create(HWND wndParent = 0) { return CModalDialog::Create(IDD_ABOUT_EASY_7ZIP, wndParent); }
+  virtual bool OnInit() Z7_override;
+  virtual void OnHelp() Z7_override;
+  virtual bool OnButtonClicked(unsigned buttonID, HWND buttonHWND) Z7_override;
+  INT_PTR Create(HWND wndParent = NULL) { return CModalDialog::Create(IDD_ABOUT_EASY_7ZIP, wndParent); }
 };
 
 #endif

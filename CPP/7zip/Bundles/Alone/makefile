@@ -1,11 +1,23 @@
 PROG = 7za.exe
 
+CFLAGS = $(CFLAGS) -DZ7_ZIP_LZFSE_DISABLE
+# -DZ7_PROG_VARIANT_A
+# CONSOLE_VARIANT_FLAGS=-DZ7_PROG_VARIANT_A
+# ZIP_FLAGS=-DZ7_ZIP_LZFSE_DISABLE
+
+# USE_C_SORT=1
+# USE_C_AES = 1
+# USE_C_SHA = 1
+# USE_C_LZFINDOPT = 1
+
 COMMON_OBJS = \
   $O\CommandLineParser.obj \
   $O\CRC.obj \
   $O\CrcReg.obj \
+  $O\DynLimBuf.obj \
   $O\IntToString.obj \
   $O\ListFileUtils.obj \
+  $O\LzFindPrepare.obj \
   $O\NewHandler.obj \
   $O\StdInStream.obj \
   $O\StdOutStream.obj \
@@ -15,10 +27,11 @@ COMMON_OBJS = \
   $O\UTFConvert.obj \
   $O\MyVector.obj \
   $O\Wildcard.obj \
-  $O\XzCrc64Init.obj \
-  $O\XzCrc64Reg.obj \
   $O\Sha1Reg.obj \
   $O\Sha256Reg.obj \
+  $O\Xxh64Reg.obj \
+  $O\XzCrc64Init.obj \
+  $O\XzCrc64Reg.obj \
 
 WIN_OBJS = \
   $O\DLL.obj \
@@ -33,8 +46,10 @@ WIN_OBJS = \
   $O\PropVariant.obj \
   $O\PropVariantConv.obj \
   $O\PropVariantUtils.obj \
+  $O\Registry.obj \
   $O\Synchronization.obj \
   $O\System.obj \
+  $O\SystemInfo.obj \
   $O\TimeUtils.obj \
 
 7ZIP_COMMON_OBJS = \
@@ -49,6 +64,7 @@ WIN_OBJS = \
   $O\MemBlocks.obj \
   $O\MethodId.obj \
   $O\MethodProps.obj \
+  $O\MultiOutStream.obj \
   $O\OffsetStream.obj \
   $O\OutBuffer.obj \
   $O\OutMemStream.obj \
@@ -68,6 +84,7 @@ AR_OBJS = \
   $O\LzmaHandler.obj \
   $O\SplitHandler.obj \
   $O\XzHandler.obj \
+  $O\ZstdHandler.obj \
 
 AR_COMMON_OBJS = \
   $O\CoderMixer2.obj \
@@ -133,7 +150,7 @@ COMPRESS_OBJS = \
   $O\BranchMisc.obj \
   $O\BranchRegister.obj \
   $O\ByteSwap.obj \
-  $O\BZip2CRC.obj \
+  $O\BZip2Crc.obj \
   $O\BZip2Decoder.obj \
   $O\BZip2Encoder.obj \
   $O\BZip2Register.obj \
@@ -161,6 +178,10 @@ COMPRESS_OBJS = \
   $O\ShrinkDecoder.obj \
   $O\XzDecoder.obj \
   $O\XzEncoder.obj \
+  $O\ZstdDecoder.obj \
+
+#  $O\LzfseDecoder.obj \
+#  $O\ZstdRegister.obj \
 
 CRYPTO_OBJS = \
   $O\7zAes.obj \
@@ -201,20 +222,24 @@ C_OBJS = \
   $O\Ppmd8.obj \
   $O\Ppmd8Dec.obj \
   $O\Ppmd8Enc.obj \
-  $O\Sha1.obj \
-  $O\Sha256.obj \
-  $O\Sort.obj \
+  $O\SwapBytes.obj \
   $O\Threads.obj \
+  $O\Xxh64.obj \
   $O\Xz.obj \
   $O\XzDec.obj \
   $O\XzEnc.obj \
   $O\XzIn.obj \
+  $O\ZstdDec.obj \
 
 !include "../../UI/Console/Console.mak"
 
 !include "../../Aes.mak"
 !include "../../Crc.mak"
 !include "../../Crc64.mak"
+!include "../../LzFindOpt.mak"
 !include "../../LzmaDec.mak"
+!include "../../Sha1.mak"
+!include "../../Sha256.mak"
+!include "../../Sort.mak"
 
 !include "../../7zip.mak"
